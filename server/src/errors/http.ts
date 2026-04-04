@@ -16,6 +16,24 @@ export class NotFoundError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  readonly statusCode = 403;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'ForbiddenError';
+  }
+}
+
+export class TooManyRequestsError extends Error {
+  readonly statusCode = 429;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'TooManyRequestsError';
+  }
+}
+
 export class ConflictError extends Error {
   readonly statusCode = 409;
 
@@ -45,14 +63,18 @@ export class InternalServerError extends Error {
 
 export type HttpError =
   | BadRequestError
+  | ForbiddenError
   | NotFoundError
+  | TooManyRequestsError
   | ConflictError
   | UnprocessableEntityError
   | InternalServerError;
 
 export const isHttpError = (error: unknown): error is HttpError =>
   error instanceof BadRequestError ||
+  error instanceof ForbiddenError ||
   error instanceof NotFoundError ||
+  error instanceof TooManyRequestsError ||
   error instanceof ConflictError ||
   error instanceof UnprocessableEntityError ||
   error instanceof InternalServerError;

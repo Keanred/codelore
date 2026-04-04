@@ -19,6 +19,7 @@ const databaseUrlDev = process.env.DATABASE_URL_DEV;
 const databaseUrlProd = process.env.DATABASE_URL_PROD;
 const productionDatabaseUrl = databaseUrlProd ?? getEnv('DATABASE_URL_PROD');
 const databaseUrl = isProduction ? productionDatabaseUrl : (databaseUrlDev ?? localDatabaseUrl);
+const githubToken = getEnv('GITHUB_PAT');
 
 if (isProduction && /(localhost|127\.0\.0\.1)/.test(databaseUrl)) {
   throw new Error('DATABASE_URL must not point to localhost in production');
