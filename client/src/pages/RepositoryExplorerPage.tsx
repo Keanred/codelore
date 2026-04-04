@@ -5,8 +5,9 @@ import Divider from '@mui/material/Divider';
 import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import React from 'react';
-import { Icon } from '../components/AppLayout';
+import { CodeLine } from '../components/CodeLine';
+import { CodeToken } from '../components/CodeToken';
+import { Icon } from '../components/Icon';
 
 // eslint-disable-next-line max-len
 const TOP_AVATAR =
@@ -32,20 +33,6 @@ const bottomNav = [
   { icon: 'settings', label: 'Settings' },
   { icon: 'account_circle', label: 'Accounts' },
 ];
-
-const CodeToken = ({ text, color }: { text: string; color?: string }) => (
-  <Box component="span" sx={{ color: color ?? '#a3aac4' }}>
-    {text}
-  </Box>
-);
-
-const CodeLine = ({ children }: { children: React.ReactNode }) => (
-  <Typography
-    sx={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.813rem', color: '#a3aac4', lineHeight: 1.75 }}
-  >
-    {children}
-  </Typography>
-);
 
 export const RepositoryExplorerPage = () => (
   <Box sx={{ minHeight: '100vh', bgcolor: '#060e20', color: '#dee5ff', overflow: 'hidden' }}>
