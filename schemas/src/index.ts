@@ -26,6 +26,16 @@ const GitHubCommitSchema = z.object({
 export type GitHubCommit = z.infer<typeof GitHubCommitSchema>;
 export { GitHubCommitSchema as GitHubCommit };
 
+const GitHubCommitSummarySchema = z.object({
+  sha: z.string(),
+  message: z.string(),
+  authorName: z.string(),
+  authorEmail: z.string(),
+  date: z.string(),
+});
+export type GitHubCommitSummary = z.infer<typeof GitHubCommitSummarySchema>;
+export { GitHubCommitSummarySchema as GitHubCommitSummary };
+
 const GitHubCommitFileSchema = z.object({
   files: z.array(
     z.object({

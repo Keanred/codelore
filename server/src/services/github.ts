@@ -1,8 +1,9 @@
-import { GitHubCommit, GitHubCommitFile, GitHubRepo } from '@codelore/schemas';
+import { GitHubCommit, GitHubCommitFile, GitHubCommitSummary, GitHubRepo } from '@codelore/schemas';
 import { z } from 'zod';
+import { config } from '../config';
 import { ForbiddenError, TooManyRequestsError } from '../errors/http';
 
-export const getUserRepos = async (token: string) => {
+export const getUserRepos = async (token: string): Promise<GitHubRepo[]> => {
   const response = await fetch('https://api.github.com/user/repos', {
     headers: {
       Authorization: `token ${token}`,
@@ -21,23 +22,22 @@ export const getUserRepos = async (token: string) => {
   if (!parsed.success) {
     throw new Error(`GitHub API error: Invalid response format`);
   }
-  const validRepos = parsed.data.map((repo) => ({
+  return parsed.data.map((repo) => ({
+    id: repo.id,
     name: repo.name,
-    fullName: repo.full_name,
+    full_name: repo.full_name,
     private: repo.private,
     url: repo.url,
   }));
-
-  return validRepos;
 };
 
-const fetchCommitPage = async (token: string, repo: string, page: number, perPage: number) => {
-  const url = new URL(`https://api.github.com/repos/${repo}/commits`);
+const fetchCommitPage = async (owner: string, repo: string, page: number, perPage: number): Promise<GitHubCommit[]> => {
+  const url = new URL(`https://api.github.com/repos/${owner}/${repo}/commits`);
   url.searchParams.set('per_page', String(perPage));
   url.searchParams.set('page', String(page));
 
   const response = await fetch(url, {
-    headers: { Authorization: `token ${token}` },
+    headers: { Authorization: `token ${config.githubToken}` },
   });
   if (response.status === 403) {
     throw new ForbiddenError('GitHub access denied');
@@ -55,12 +55,12 @@ const fetchCommitPage = async (token: string, repo: string, page: number, perPag
   return parsed.data;
 };
 
-export const getRepoCommits = async (token: string, repo: string, max = 100) => {
+export const getRepoCommits = async (owner: string, repo: string, max = 100): Promise<GitHubCommitSummary[]> => {
   const perPage = Math.min(max, 100);
   const pages = Math.ceil(max / perPage);
 
   const results = await Promise.all(
-    Array.from({ length: pages }, (_, i) => fetchCommitPage(token, repo, i + 1, perPage)),
+    Array.from({ length: pages }, (_, i) => fetchCommitPage(owner, repo, i + 1, perPage)),
   );
   return results
     .flat()
@@ -74,10 +74,10 @@ export const getRepoCommits = async (token: string, repo: string, max = 100) => 
     }));
 };
 
-export const getCommitFiles = async (token: string, repo: string, sha: string) => {
-  const response = await fetch(`https://api.github.com/repos/${repo}/commits/${sha}`, {
+export const getCommitFiles = async (owner: string, repo: string, sha: string): Promise<GitHubCommitFile['files']> => {
+  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits/${sha}`, {
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `token ${config.githubToken}`,
     },
   });
   if (response.status === 403) {

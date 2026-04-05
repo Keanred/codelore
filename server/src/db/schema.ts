@@ -4,6 +4,7 @@ export const repos = pgTable('repos', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   githubId: text('github_id').notNull(),
+  githubOwner: text('github_owner').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

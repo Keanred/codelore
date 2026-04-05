@@ -17,8 +17,9 @@ const postgresPort = getEnv('POSTGRES_PORT', '5432');
 const localDatabaseUrl = `postgresql://${postgresUser}:${postgresPassword}@${postgresHost}:${postgresPort}/${postgresDb}`;
 const databaseUrlDev = process.env.DATABASE_URL_DEV;
 const databaseUrlProd = process.env.DATABASE_URL_PROD;
-const productionDatabaseUrl = databaseUrlProd ?? getEnv('DATABASE_URL_PROD');
-const databaseUrl = isProduction ? productionDatabaseUrl : (databaseUrlDev ?? localDatabaseUrl);
+const databaseUrl = isProduction
+  ? (databaseUrlProd ?? getEnv('DATABASE_URL_PROD'))
+  : (databaseUrlDev ?? localDatabaseUrl);
 const githubToken = getEnv('GITHUB_PAT');
 
 if (isProduction && /(localhost|127\.0\.0\.1)/.test(databaseUrl)) {
@@ -29,4 +30,5 @@ export const config = {
   databaseUrl,
   nodeEnv,
   port: parseInt(getEnv('PORT', '3001'), 10),
+  githubToken,
 };

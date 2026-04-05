@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Link, useRouterState } from '@tanstack/react-router';
+import { CodeloreLogo } from './CodeloreLogo';
 import { Icon } from './Icon';
 
 const AVATAR_SRC =
@@ -88,7 +89,9 @@ export const SideNavBar = () => {
     >
       {/* Brand */}
       <Box sx={{ p: 3 }}>
-        <Typography
+        <Stack direction="row" alignItems="center" gap={1.5}>
+          <CodeloreLogo />
+          <Typography
           sx={{
             fontSize: '1.25rem',
             fontWeight: 700,
@@ -97,8 +100,9 @@ export const SideNavBar = () => {
             fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
-          Codelore
-        </Typography>
+            Codelore
+          </Typography>
+        </Stack>
         <Typography
           sx={{
             fontSize: '0.625rem',
