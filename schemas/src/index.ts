@@ -102,6 +102,7 @@ export type ConnectRepoInput = z.infer<typeof ConnectRepoInputSchema>;
 export { ConnectRepoInputSchema as ConnectRepoInput };
 
 const CreateNoteInputSchema = z.object({
+  fileId: z.string().uuid(),
   content: z.string().min(1, 'Content is required'),
 });
 export type CreateNoteInput = z.infer<typeof CreateNoteInputSchema>;
