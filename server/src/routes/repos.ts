@@ -3,6 +3,7 @@ import { Request, Response, Router } from 'express';
 import { config } from '../config';
 import { getUserRepos } from '../services/github';
 import { connectRepo, getRepoById, getRepos } from '../services/repos';
+import { syncRepo } from '../services/sync';
 
 const router = Router();
 const githubToken = config.githubToken;
@@ -19,6 +20,20 @@ router.get('/repos', async (_req: Request, res: Response) => {
   res.json(results);
 });
 
+router.post('/repos/:id/sync', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const repo = await getRepoById(id);
+  if (!repo) {
+    return res.status(404).json({ error: 'Repository not found' });
+  }
+  syncRepo(repo.id, repo.githubOwner, repo.name)
+    .then(() => res.json({ message: 'Sync started' }))
+    .catch((err) => {
+      console.error(`syncRepo failed for repo ${repo.id}:`, err);
+      res.status(500).json({ error: 'Failed to start sync' });
+    });
+});
+
 // Get a single connected repository by ID
 router.get('/repos/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -30,6 +45,9 @@ router.get('/repos/:id', async (req: Request, res: Response) => {
 router.post('/repos/connect', async (req: Request, res: Response) => {
   const input = ConnectRepoInput.parse(req.body);
   const result = await connectRepo(input);
+  syncRepo(result.id, input.owner, input.name).catch((err) =>
+    console.error(`syncRepo failed for repo ${result.id}:`, err),
+  );
   res.status(201).json(result);
 });
 

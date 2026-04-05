@@ -31,10 +31,17 @@ export const getUserRepos = async (token: string): Promise<GitHubRepo[]> => {
   }));
 };
 
-const fetchCommitPage = async (owner: string, repo: string, page: number, perPage: number): Promise<GitHubCommit[]> => {
+const fetchCommitPage = async (
+  owner: string,
+  repo: string,
+  page: number,
+  perPage: number,
+  since?: string,
+): Promise<GitHubCommit[]> => {
   const url = new URL(`https://api.github.com/repos/${owner}/${repo}/commits`);
   url.searchParams.set('per_page', String(perPage));
   url.searchParams.set('page', String(page));
+  if (since) url.searchParams.set('since', since);
 
   const response = await fetch(url, {
     headers: { Authorization: `token ${config.githubToken}` },
@@ -55,12 +62,17 @@ const fetchCommitPage = async (owner: string, repo: string, page: number, perPag
   return parsed.data;
 };
 
-export const getRepoCommits = async (owner: string, repo: string, max = 100): Promise<GitHubCommitSummary[]> => {
+export const getRepoCommits = async (
+  owner: string,
+  repo: string,
+  max = 100,
+  since?: string,
+): Promise<GitHubCommitSummary[]> => {
   const perPage = Math.min(max, 100);
   const pages = Math.ceil(max / perPage);
 
   const results = await Promise.all(
-    Array.from({ length: pages }, (_, i) => fetchCommitPage(owner, repo, i + 1, perPage)),
+    Array.from({ length: pages }, (_, i) => fetchCommitPage(owner, repo, i + 1, perPage, since)),
   );
   return results
     .flat()

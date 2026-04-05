@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
 export const repos = pgTable('repos', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -8,35 +8,47 @@ export const repos = pgTable('repos', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-export const files = pgTable('files', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  repoId: uuid('repo_id')
-    .notNull()
-    .references(() => repos.id),
-  path: text('path').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const files = pgTable(
+  'files',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    repoId: uuid('repo_id')
+      .notNull()
+      .references(() => repos.id),
+    path: text('path').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => [unique('files_repo_id_path_unique').on(table.repoId, table.path)],
+);
 
-export const commits = pgTable('commits', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  repoId: uuid('repo_id')
-    .notNull()
-    .references(() => repos.id),
-  commitHash: text('commit_hash').notNull(),
-  message: text('message').notNull(),
-  author: text('author').notNull(),
-  date: timestamp('date').notNull(),
-});
+export const commits = pgTable(
+  'commits',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    repoId: uuid('repo_id')
+      .notNull()
+      .references(() => repos.id),
+    commitHash: text('commit_hash').notNull(),
+    message: text('message').notNull(),
+    author: text('author').notNull(),
+    date: timestamp('date').notNull(),
+  },
+  (table) => [unique('commits_repo_id_commit_hash_unique').on(table.repoId, table.commitHash)],
+);
 
-export const fileCommits = pgTable('file_commits', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  fileId: uuid('file_id')
-    .notNull()
-    .references(() => files.id),
-  commitId: uuid('commit_id')
-    .notNull()
-    .references(() => commits.id),
-});
+export const fileCommits = pgTable(
+  'file_commits',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => files.id),
+    commitId: uuid('commit_id')
+      .notNull()
+      .references(() => commits.id),
+  },
+  (table) => [unique('file_commits_file_id_commit_id_unique').on(table.fileId, table.commitId)],
+);
 
 export const notes = pgTable('notes', {
   id: uuid('id').primaryKey().defaultRandom(),

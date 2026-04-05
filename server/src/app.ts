@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import { isHttpError } from './errors/http';
+import reposRouter from './routes/repos';
 
 const app = express();
 
@@ -17,5 +18,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
   res.status(500).json({ success: false, error: 'Something went wrong!' });
 });
+
+app.use('/api', reposRouter);
 
 export default app;
