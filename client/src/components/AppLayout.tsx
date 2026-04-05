@@ -8,14 +8,12 @@ export { Icon } from './Icon';
 // ─── AppLayout ────────────────────────────────────────────────────────────────
 
 interface AppLayoutProps {
-  sidebarActive?: string;
-  topNavActive?: string;
   children: React.ReactNode;
 }
 
-export const AppLayout = ({ sidebarActive = 'Explorer', topNavActive = 'File', children }: AppLayoutProps) => (
+export const AppLayout = ({ children }: AppLayoutProps) => (
   <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#060e20', overflow: 'hidden' }}>
-    <SideNavBar active={sidebarActive} />
+    <SideNavBar />
     <Box
       component="main"
       sx={{
@@ -28,9 +26,8 @@ export const AppLayout = ({ sidebarActive = 'Explorer', topNavActive = 'File', c
         bgcolor: '#060e20',
       }}
     >
-      <TopNavBar active={topNavActive} />
+      <TopNavBar />
       <Box sx={{ flex: 1, overflowY: 'auto' }}>{children}</Box>
     </Box>
   </Box>
 );
-

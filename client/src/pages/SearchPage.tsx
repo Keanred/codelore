@@ -12,17 +12,15 @@ import { SectionHeader } from '../components/SectionHeader';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line max-len
 const FELIX_AVATAR =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDmEFLqs2KsI-ysYHSfoqNFFMdXg1SRZydeM0x1Q0f4A4mvAMzhdZeyrmEiNf9CE6aCuITtMlyn0GxmFLwchqhDC3YfdoBBIyBr2OCpTD-9HW31bb5_I_sV6qTokdX2QG4uOeQRPeTZTSdCZHTfQUpZ5l4wCxm4JsYMsG7lVbq-NG1HLIc47GefzXVDJjEu9U0RXAINI21ySRclTEg39Jy_PDaCzv7Gr1UXZYApH_esodtDAi1dk_WY6yRobSDrZMDxRqceuhgC3Dc';
-// eslint-disable-next-line max-len
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuDmEFLqs2KsI-ysYHSfoqNFFMdXg1SRZydeM0x1Q0f4A4mvAMzhdZeyrmEiNf9CE6aCuITtMlyn0GxmFLwchqhDC3YfdoBBIyBr2OCpTD-9HW31bb5_I_sV6qTokdX2QG4uOeQRPeTZTSdCZHTfQUpZ5l4wCxm4JsYMsG7lVbq-NG1HLIc47GefzXVDJjEu9U0RXAINI21ySRclTEg39Jy_PDaCzv7Gr1UXZYApH_esodtDAi1dk_WY6yRobSDrZMDxRqceuhgC3Dc'; // eslint-disable-line max-len
 const SARAH_AVATAR =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuD4wkMS7FGYnFhz4QBPdAcRdQpxCNOwZy0MzKKnJ6_evChuPtpAaItLgzfUJSrM1BIAdtoNF16ZMZ9mML7w3bl8u4790UcXNkr-GQ3ttONw-5ziJ4KLOiGi6_pWWf6NtNt7A99x-TA1-fhH65xhy2rO07EAUu6b87YjdyQj0VvW1iaCCJKCkQm2TJtpwM3uNLWCb7oxB2hedmCwZ1EW28LrQI_ru2CWQEQDgQ6egbZp2Z-C7rj9R2t20eZZTW9Ob-r7JFytUUE8piI';
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuD4wkMS7FGYnFhz4QBPdAcRdQpxCNOwZy0MzKKnJ6_evChuPtpAaItLgzfUJSrM1BIAdtoNF16ZMZ9mML7w3bl8u4790UcXNkr-GQ3ttONw-5ziJ4KLOiGi6_pWWf6NtNt7A99x-TA1-fhH65xhy2rO07EAUu6b87YjdyQj0VvW1iaCCJKCkQm2TJtpwM3uNLWCb7oxB2hedmCwZ1EW28LrQI_ru2CWQEQDgQ6egbZp2Z-C7rj9R2t20eZZTW9Ob-r7JFytUUE8piI'; // eslint-disable-line max-len
 
 // ─── Search Page ──────────────────────────────────────────────────────────────
 
 export const SearchPage = () => (
-  <AppLayout sidebarActive="Search" topNavActive="View">
+  <AppLayout>
     <Box sx={{ p: 4, maxWidth: 896, mx: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
       {/* Search input */}
       <Box

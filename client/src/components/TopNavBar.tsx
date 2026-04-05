@@ -2,130 +2,83 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import { Icon } from './Icon';
 
-const menuItems = ['File', 'Edit', 'Selection', 'View', 'Go'];
+const AVATAR_SRC =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuDxZGhb2vbXFJscDCUeGxw7QoxLzQTkIvYeMSo0e26F7ZoKv4UwhWVx3r0ggLYDULuMLBVxLDLC9Q3o4Fa47uDC4c-n3De8Q1URoTxbGL77KxEhe6ZGXCjVHC89LnL0F9nqJgGVkSE0QFsWuXOsEC1qWIH5MMU5Ug0N_RPYQL4fYlCzE2QK_C_PDA3VIdQ1IcL8jFARo-kSJdHqZSfSx3qokTOJ5VtxvDDY5NFudskM41bX1Bgwf71M8TEBKhCJ2l_yM78zmycqOb0'; // eslint-disable-line max-len
 
-interface TopNavBarProps {
-  active: string;
-}
-
-export const TopNavBar = ({ active }: TopNavBarProps) => (
+export const TopNavBar = () => (
   <Box
     component="header"
     sx={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       px: 4,
-      height: 56,
-      bgcolor: '#0f172a',
-      borderBottom: '1px solid rgba(99,102,241,0.1)',
+      height: 64,
+      borderBottom: '1px solid rgba(163,166,255,0.15)',
+      bgcolor: 'rgba(6,14,32,0.8)',
+      backdropFilter: 'blur(24px)',
+      flexShrink: 0,
     }}
   >
-    <Stack direction="row" alignItems="center" gap={4}>
-      <Typography
-        sx={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontWeight: 900,
-          color: '#6366F1',
-          fontSize: '1.2rem',
-          letterSpacing: '-0.05em',
-        }}
-      >
-        Codelore
-      </Typography>
-      <Stack direction="row" gap={0.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
-        {menuItems.map((item) => {
-          const isActive = item === active;
-          return (
-            <Typography
-              key={item}
-              component="span"
-              sx={{
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontFamily: "'Inter', sans-serif",
-                px: 1,
-                py: 2,
-                color: isActive ? '#818CF8' : '#94A3B8',
-                borderBottom: isActive ? '2px solid #6366F1' : '2px solid transparent',
-                '&:hover': isActive ? {} : { color: '#fff', bgcolor: 'rgba(255,255,255,0.05)' },
-                transition: 'all 0.2s',
-              }}
-            >
-              {item}
-            </Typography>
-          );
-        })}
-      </Stack>
-    </Stack>
-
-    <Stack direction="row" alignItems="center" gap={2}>
+    <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
       <Box
         sx={{
-          position: 'relative',
-          display: { xs: 'none', lg: 'flex' },
-          alignItems: 'center',
-          bgcolor: '#141f38',
-          borderRadius: '6px',
-          px: 1.5,
-          py: 0.5,
+          position: 'absolute',
+          left: 12,
+          color: '#475569',
+          display: 'flex',
+          fontSize: 18,
+          zIndex: 1,
         }}
       >
-        <Box sx={{ color: '#64748B', fontSize: 18, mr: 1, display: 'flex' }}>
-          <Icon name="search" />
-        </Box>
-        <InputBase
-          placeholder="Search knowledge base..."
-          inputProps={{
-            style: {
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.85rem',
-              color: '#dee5ff',
-              width: 240,
-            },
-          }}
-        />
+        <Icon name="search" />
       </Box>
-      <Stack direction="row" gap={0.5}>
-        {[
-          { icon: 'terminal', badge: false },
-          { icon: 'notifications', badge: true },
-          { icon: 'help_outline', badge: false },
-        ].map(({ icon, badge }) => (
-          <IconButton
-            key={icon}
-            size="small"
-            sx={{
-              color: '#94A3B8',
-              borderRadius: '6px',
-              '&:hover': { color: '#818CF8', bgcolor: 'rgba(255,255,255,0.05)' },
-              position: 'relative',
-              fontSize: 20,
-            }}
-          >
+      <InputBase
+        placeholder="Search resources..."
+        inputProps={{
+          style: {
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            color: '#dee5ff',
+            paddingLeft: 40,
+            paddingRight: 16,
+            paddingTop: 8,
+            paddingBottom: 8,
+            width: 256,
+          },
+        }}
+        sx={{
+          bgcolor: '#141f38',
+          borderRadius: '8px',
+          '& .MuiInputBase-input::placeholder': { color: '#475569', opacity: 1 },
+        }}
+      />
+    </Box>
+
+    <Stack direction="row" alignItems="center" gap={0.5}>
+      {['notifications', 'account_tree'].map((icon) => (
+        <IconButton
+          key={icon}
+          sx={{
+            color: '#94a3b8',
+            transition: 'color 0.2s',
+            '&:hover': { color: '#a3a6ff' },
+          }}
+        >
+          <Box sx={{ fontSize: 20, display: 'flex' }}>
             <Icon name={icon} />
-            {badge && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 6,
-                  right: 6,
-                  width: 8,
-                  height: 8,
-                  bgcolor: '#ff6e84',
-                  borderRadius: '50%',
-                }}
-              />
-            )}
-          </IconButton>
-        ))}
-      </Stack>
+          </Box>
+        </IconButton>
+      ))}
+      <Box sx={{ width: 1, height: 32, bgcolor: 'rgba(163,166,255,0.1)', mx: 1 }} />
+      <Box
+        component="img"
+        src={AVATAR_SRC}
+        alt="Developer Avatar"
+        sx={{ width: 32, height: 32, borderRadius: '8px', objectFit: 'cover' }}
+      />
     </Stack>
   </Box>
 );

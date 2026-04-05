@@ -1,6 +1,6 @@
 import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+import { CodeExplorerPage } from './pages/CodeExplorerPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { RepositoryExplorerPage } from './pages/RepositoryExplorerPage';
 import { SearchPage } from './pages/SearchPage';
 
 const rootRoute = createRootRoute({
@@ -22,7 +22,7 @@ const searchRoute = createRoute({
 const repositoryExplorerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/repository-explorer',
-  component: RepositoryExplorerPage,
+  component: CodeExplorerPage,
 });
 
 const routeTree = rootRoute.addChildren([homeRoute, searchRoute, repositoryExplorerRoute]);
