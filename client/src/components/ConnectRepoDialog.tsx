@@ -5,10 +5,8 @@ import DialogContent from '@mui/material/DialogContent';
 import InputBase from '@mui/material/InputBase';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { connectRepo, getExternalRepos } from '../api';
-import { queryClient } from '../App';
+import { useConnectRepoMutation, useExternalReposQuery, useReposQuery } from '../reposQuery';
 import { Icon } from './Icon';
 
 interface ConnectRepoDialogProps {
@@ -20,27 +18,15 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
   const [search, setSearch] = useState('');
   const [connecting, setConnecting] = useState<string | null>(null);
 
-  const { data: externalRepos = [], isLoading } = useQuery({
-    queryKey: ['external-repos'],
-    queryFn: getExternalRepos,
-    enabled: open,
-  });
+  const { data: externalRepos = [], isLoading } = useExternalReposQuery(open);
+  const { data: connectedRepos = [] } = useReposQuery();
+  const { mutate } = useConnectRepoMutation(setConnecting, onClose);
 
-  const { mutate } = useMutation({
-    mutationFn: connectRepo,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repos'] });
-      setConnecting(null);
-      onClose();
-    },
-    onError: () => {
-      setConnecting(null);
-    },
-  });
+  const connectedGithubIds = new Set(connectedRepos.map((r) => r.githubId));
+  const availableRepos = externalRepos.filter((repo) => !connectedGithubIds.has(String(repo.id)));
+  const filtered = availableRepos.filter((repo) => repo.full_name.toLowerCase().includes(search.toLowerCase()));
 
-  const filtered = externalRepos.filter((repo) => repo.full_name.toLowerCase().includes(search.toLowerCase()));
-
-  const remaining = Math.max(0, externalRepos.length - filtered.length);
+  const remaining = Math.max(0, availableRepos.length - filtered.length);
 
   const handleConnect = (repo: (typeof externalRepos)[number]) => {
     const owner = repo.full_name.split('/')[0];
@@ -170,15 +156,18 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
             '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
           }}
         >
-          {isLoading ? (
+          {isLoading && (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <CircularProgress size={24} sx={{ color: 'primary.main' }} />
             </Box>
-          ) : filtered.length === 0 ? (
+          )}
+          {!isLoading && filtered.length === 0 && (
             <Typography sx={{ textAlign: 'center', color: '#475569', py: 4, fontSize: '0.875rem' }}>
               No repositories found.
             </Typography>
-          ) : (
+          )}
+          {!isLoading &&
+            filtered.length > 0 &&
             filtered.map((repo) => (
               <Box
                 key={repo.id}
@@ -234,8 +223,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
                   {connecting === repo.full_name ? 'Connecting…' : 'Connect'}
                 </Box>
               </Box>
-            ))
-          )}
+            ))}
         </Box>
       </DialogContent>
 
@@ -253,7 +241,9 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Icon name="info" style={{ fontSize: 16, color: '#a3aac4' }} />
           <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-            {remaining > 0 ? `${remaining} more repositories available` : `${externalRepos.length} repositories loaded`}
+            {remaining > 0
+              ? `${remaining} more repositories available`
+              : `${availableRepos.length} repositories loaded`}
           </Typography>
         </Box>
         <Box

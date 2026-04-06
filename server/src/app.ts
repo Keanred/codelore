@@ -5,6 +5,7 @@ import filesRouter from './routes/files';
 import notesRouter from './routes/notes';
 import reposRouter from './routes/repos';
 import searchRouter from './routes/search';
+import statsRouter from './routes/stats';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api', reposRouter);
 app.use('/api', filesRouter);
 app.use('/api', notesRouter);
 app.use('/api', searchRouter);
+app.use('/api', statsRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);

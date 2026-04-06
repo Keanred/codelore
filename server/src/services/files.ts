@@ -1,3 +1,4 @@
+import { dbGetCommitsByRepoId } from '../db/queries/commits';
 import { dbGetCommitsByFileId, dbGetFileById, dbGetFileCount, dbGetFilesByRepoId } from '../db/queries/files';
 import { Commit, File } from '../db/schema';
 import { NotFoundError } from '../errors/http';
@@ -16,6 +17,10 @@ export const getFileById = async (fileId: string): Promise<File | null> => {
 
 export const getCommitsByFileId = async (fileId: string): Promise<Commit[]> => {
   return await dbGetCommitsByFileId(fileId);
+};
+
+export const getCommitsByRepoId = async (repoId: string): Promise<Commit[]> => {
+  return await dbGetCommitsByRepoId(repoId);
 };
 
 export const getFileCount = async () => {

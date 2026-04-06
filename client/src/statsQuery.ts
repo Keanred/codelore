@@ -5,6 +5,7 @@ import { queryClient } from './App';
 export const statsQueryOptions = queryOptions({
   queryKey: ['stats'],
   queryFn: getStats,
+  refetchInterval: 10_000,
 });
 
 export const useStatsQuery = () =>

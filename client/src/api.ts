@@ -54,11 +54,11 @@ export const getRepos = async (): Promise<RepoResponse[]> => {
 };
 
 export const getExternalRepos = async (): Promise<GitHubRepo[]> => {
-  return request<GitHubRepo[]>('/external-repos');
+  return request<GitHubRepo[]>('/repos/external');
 };
 
 export const connectRepo = async (input: ConnectRepoInput): Promise<RepoResponse> => {
-  return request<RepoResponse, ConnectRepoInput>('/repos', 'POST', input);
+  return request<RepoResponse, ConnectRepoInput>('/repos/connect', 'POST', input);
 };
 
 export const triggerSync = async (repoId: string): Promise<void> => {
@@ -101,6 +101,6 @@ export const search = async (query: string, repoId?: string): Promise<SearchResp
   return request<SearchResponse>(`/search?${params.toString()}`);
 };
 
-export const getStats = async (): Promise<{ repoCount: number; fileCount: number; noteCount: number }> => {
-  return request<{ repoCount: number; fileCount: number; noteCount: number }>('/stats');
+export const getStats = async (): Promise<{ totalRepos: number; totalFiles: number; totalNotes: number }> => {
+  return request<{ totalRepos: number; totalFiles: number; totalNotes: number }>('/stats');
 };

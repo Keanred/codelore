@@ -20,7 +20,7 @@ export const DashboardPage = () => {
     {
       label: 'Total Repositories',
       icon: 'folder_zip',
-      value: statsData ? statsData.repoCount.toString() : '...',
+      value: statsData ? statsData.totalRepos.toString() : '...',
       footerIcon: 'trending_up',
       footerColor: '#69f6b8',
       footerText: '+2 this month',
@@ -28,7 +28,7 @@ export const DashboardPage = () => {
     {
       label: 'Files Indexed',
       icon: 'description',
-      value: statsData ? statsData.fileCount.toString() : '...',
+      value: statsData ? statsData.totalFiles.toString() : '...',
       footerIcon: 'check_circle',
       footerColor: '#69f6b8',
       footerText: '98.2% Accuracy',
@@ -36,7 +36,7 @@ export const DashboardPage = () => {
     {
       label: 'Generated Notes',
       icon: 'sticky_note_2',
-      value: statsData ? statsData.noteCount.toString() : '...',
+      value: statsData ? statsData.totalNotes.toString() : '...',
       footerIcon: 'auto_awesome',
       footerColor: '#a3a6ff',
       footerText: 'AI Enhanced',

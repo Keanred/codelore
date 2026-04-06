@@ -29,3 +29,7 @@ export const dbGetLatestCommitDate = async (repoId: string): Promise<string | nu
     .limit(1);
   return result ? result.date.toISOString() : null;
 };
+
+export const dbGetCommitsByRepoId = async (repoId: string) => {
+  return db.select().from(commits).where(eq(commits.repoId, repoId)).orderBy(desc(commits.date));
+};

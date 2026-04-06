@@ -1,8 +1,19 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { InternalServerError, isHttpError } from '../errors/http';
-import { getCommitsByFileId, getFileById, getFilesByRepoId } from '../services/files';
+import { getCommitsByFileId, getCommitsByRepoId, getFileById, getFilesByRepoId } from '../services/files';
 
 const filesRouter = Router();
+
+filesRouter.get('/repos/:repoId/commits', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { repoId } = req.params;
+    const commits = await getCommitsByRepoId(repoId);
+    res.json(commits);
+  } catch (error) {
+    console.error('Error fetching commits for repo:', error);
+    next(isHttpError(error) ? error : new InternalServerError('Failed to fetch commits'));
+  }
+});
 
 filesRouter.get('/repos/:repoId/files', async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -1,3 +1,4 @@
+import { FileResponse } from '@codelore/schemas';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Icon } from './Icon';
@@ -14,11 +15,13 @@ interface RowProps {
   indent?: number;
   active?: boolean;
   dimmed?: boolean;
+  onClick?: () => void;
   children: React.ReactNode;
 }
 
-const Row = ({ indent = 0, active = false, dimmed = false, children }: RowProps) => (
+const Row = ({ indent = 0, active = false, dimmed = false, onClick, children }: RowProps) => (
   <Box
+    onClick={onClick}
     sx={{
       pl: 1.5 + indent * 2,
       pr: 1.5,
@@ -41,7 +44,35 @@ const Row = ({ indent = 0, active = false, dimmed = false, children }: RowProps)
 
 // ─── FileTree ─────────────────────────────────────────────────────────────────
 
-export const FileTree = () => {
+type TreeNode = { name: string; path: string; children: TreeNode[] };
+
+function flatPathsToTree(paths: string[]): TreeNode[] {
+  const root: TreeNode = { name: '', path: '', children: [] };
+
+  for (const fullPath of paths) {
+    const parts = fullPath.split('/');
+    let currentNode = root;
+
+    for (const part of parts) {
+      let childNode = currentNode.children.find((child) => child.name === part);
+      if (!childNode) {
+        childNode = { name: part, path: currentNode.path ? `${currentNode.path}/${part}` : part, children: [] };
+        currentNode.children.push(childNode);
+      }
+      currentNode = childNode;
+    }
+  }
+
+  return root.children;
+}
+
+type FileTreeProps = {
+  files: FileResponse[];
+  selectedFileId: string | null;
+  onSelect: (file: FileResponse) => void;
+};
+export const FileTree = ({ files, selectedFileId, onSelect }: FileTreeProps) => {
+  const tree = flatPathsToTree(files.map((file) => file.path));
   return (
     <Box
       component="section"
@@ -83,6 +114,48 @@ export const FileTree = () => {
       </Box>
 
       {/* Tree */}
+      {tree.length === 0 ? (
+        <Box sx={{ p: 2 }}>
+          <Typography sx={{ fontSize: '0.875rem', color: '#64748b' }}>No files found in this repository.</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ flex: 1, overflowY: 'auto' }}>
+          {tree.map((node) => (
+            <Row
+              key={node.path}
+              active={selectedFileId === node.path}
+              onClick={() => onSelect(files.find((file) => file.path === node.path)!)}
+            >
+              <Icon
+                name={node.children.length > 0 ? 'folder' : 'description'}
+                filled={node.children.length > 0}
+                style={{ fontSize: 16, color: node.children.length > 0 ? '#a3a6ff' : '#ff9dd1', flexShrink: 0 }}
+              />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
+            </Row>
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+// ─── Example Usage ───────────────────────────────────────────────────────────
+
+export const ExampleFileTree = () => {
+  return (
+    <Box
+      sx={{
+        width: 256,
+        flexShrink: 0,
+        bgcolor: '#091328',
+        borderRight: '1px solid rgba(64,72,93,0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header */}
       <Box
         sx={{
           flex: 1,
