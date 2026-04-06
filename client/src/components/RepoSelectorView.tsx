@@ -182,7 +182,7 @@ const RepoRow = ({ repo, selected, onSelect }: RepoRowProps) => (
 
     {/* Connected date */}
     <Typography sx={{ fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace", color: '#6d758c' }}>
-      {repo.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+      {new Date(repo.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
     </Typography>
 
     {/* Actions */}

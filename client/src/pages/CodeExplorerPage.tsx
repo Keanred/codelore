@@ -1,4 +1,4 @@
-import { RepoResponse } from '@codelore/schemas';
+import { FileResponse, RepoResponse } from '@codelore/schemas';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
@@ -9,12 +9,15 @@ import { Icon } from '../components/Icon';
 import { MemoryPanel } from '../components/MemoryPanel';
 import { RepoSelectorView } from '../components/RepoSelectorView';
 import { SideNav } from '../components/SideNav';
+import { useFilesQuery } from '../filesQuery';
 import { useReposQuery } from '../reposQuery';
 
 export const CodeExplorerPage = () => {
   const { data: repos = [] } = useReposQuery();
   const [selectedRepo, setSelectedRepo] = useState<RepoResponse | null>(null);
   const [isConnectOpen, setConnectOpen] = useState(false);
+  const { data: files = [] } = useFilesQuery(selectedRepo?.id || '');
+  const [selectedFile, setSelectedFile] = useState<FileResponse | null>(null);
 
   const handleSelectRepo = (repo: RepoResponse) => setSelectedRepo(repo);
   const handleBackToSelector = () => setSelectedRepo(null);
@@ -182,14 +185,11 @@ export const CodeExplorerPage = () => {
       </Box>
 
       {/* Main content */}
-      <Box
-        component="main"
-        sx={{ ml: '256px', pt: '64px', height: '100vh', display: 'flex', overflow: 'hidden' }}
-      >
+      <Box component="main" sx={{ ml: '256px', pt: '64px', height: '100vh', display: 'flex', overflow: 'hidden' }}>
         {selectedRepo ? (
           /* 3-column code explorer */
           <>
-            <FileTree files={[]} selectedFileId={null} onSelect={() => {}} />
+            <FileTree files={files} selectedFileId={selectedFile?.path ?? null} onSelect={setSelectedFile} />
             <CodeViewer />
             <MemoryPanel />
           </>

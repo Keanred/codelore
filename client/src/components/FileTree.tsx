@@ -31,11 +31,12 @@ const Row = ({ indent = 0, active = false, dimmed = false, onClick, children }: 
       gap: 1,
       cursor: 'pointer',
       opacity: dimmed ? 0.6 : 1,
-      color: active ? '#818cf8' : '#a3aac4',
-      bgcolor: active ? 'rgba(163,166,255,0.05)' : 'transparent',
-      borderLeft: active ? '2px solid #a3a6ff' : '2px solid transparent',
+      color: active ? '#c7d2fe' : '#a3aac4',
+      fontWeight: active ? 600 : 400,
+      bgcolor: active ? 'rgba(99,102,241,0.18)' : 'transparent',
+      borderLeft: active ? '2px solid #818cf8' : '2px solid transparent',
       transition: 'background-color 0.15s',
-      '&:hover': { bgcolor: active ? 'rgba(163,166,255,0.05)' : '#192540' },
+      '&:hover': { bgcolor: active ? 'rgba(99,102,241,0.22)' : '#192540' },
     }}
   >
     {children}
@@ -46,7 +47,7 @@ const Row = ({ indent = 0, active = false, dimmed = false, onClick, children }: 
 
 type TreeNode = { name: string; path: string; children: TreeNode[] };
 
-function flatPathsToTree(paths: string[]): TreeNode[] {
+const flatPathsToTree = (paths: string[]): TreeNode[] => {
   const root: TreeNode = { name: '', path: '', children: [] };
 
   for (const fullPath of paths) {
@@ -64,7 +65,7 @@ function flatPathsToTree(paths: string[]): TreeNode[] {
   }
 
   return root.children;
-}
+};
 
 type FileTreeProps = {
   files: FileResponse[];
@@ -73,6 +74,27 @@ type FileTreeProps = {
 };
 export const FileTree = ({ files, selectedFileId, onSelect }: FileTreeProps) => {
   const tree = flatPathsToTree(files.map((file) => file.path));
+
+  const renderTree = (nodes: TreeNode[], indent = 0): React.ReactNode[] => {
+    return nodes.flatMap((node) => {
+      const isFolder = node.children.length > 0;
+      const file = !isFolder ? files.find((f) => f.path === node.path) : undefined;
+      return [
+        <Row
+          key={node.path}
+          indent={indent}
+          active={node.path === selectedFileId}
+          onClick={() => file && onSelect(file)}
+        >
+          <ArrowSpacer />
+          <Icon name={isFolder ? 'folder' : 'description'} style={{ fontSize: 16, flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
+        </Row>,
+        ...renderTree(node.children, indent + 1),
+      ];
+    });
+  };
+
   return (
     <Box
       component="section"
@@ -114,28 +136,7 @@ export const FileTree = ({ files, selectedFileId, onSelect }: FileTreeProps) => 
       </Box>
 
       {/* Tree */}
-      {tree.length === 0 ? (
-        <Box sx={{ p: 2 }}>
-          <Typography sx={{ fontSize: '0.875rem', color: '#64748b' }}>No files found in this repository.</Typography>
-        </Box>
-      ) : (
-        <Box sx={{ flex: 1, overflowY: 'auto' }}>
-          {tree.map((node) => (
-            <Row
-              key={node.path}
-              active={selectedFileId === node.path}
-              onClick={() => onSelect(files.find((file) => file.path === node.path)!)}
-            >
-              <Icon
-                name={node.children.length > 0 ? 'folder' : 'description'}
-                filled={node.children.length > 0}
-                style={{ fontSize: 16, color: node.children.length > 0 ? '#a3a6ff' : '#ff9dd1', flexShrink: 0 }}
-              />
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
-            </Row>
-          ))}
-        </Box>
-      )}
+      {renderTree(tree)}
     </Box>
   );
 };
