@@ -3,6 +3,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import InputBase from '@mui/material/InputBase';
+import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -55,7 +56,8 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
       fullWidth
       PaperProps={{
         sx: {
-          bgcolor: 'rgba(25,37,64,0.85)',
+          bgcolor: 'rgba(25,37,64,0.6)',
+          backgroundImage: 'none',
           backdropFilter: 'blur(24px)',
           borderRadius: '16px',
           border: '1px solid rgba(99,102,241,0.2)',
@@ -66,7 +68,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
       }}
       sx={{
         '& .MuiBackdrop-root': {
-          bgcolor: 'rgba(6,14,32,0.8)',
+          bgcolor: (theme) => alpha(theme.palette.background.default, 0.8),
           backdropFilter: 'blur(4px)',
         },
       }}
@@ -93,7 +95,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
           >
             Connect GitHub Repository
           </Typography>
-          <Typography sx={{ fontSize: '0.875rem', color: '#a3aac4', mt: 0.5 }}>
+          <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', mt: 0.5 }}>
             Select a repository to begin indexing.
           </Typography>
         </Box>
@@ -116,31 +118,40 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
       </Box>
 
       {/* Body */}
-      <DialogContent sx={{ p: 3, pb: 0 }}>
+      <DialogContent sx={{ p: 3 }}>
         {/* Search */}
-        <Box
-          sx={{
-            position: 'relative',
-            mb: 3,
-            bgcolor: '#192540',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            px: 1.5,
-          }}
-        >
-          <Icon name="search" style={{ color: '#64748b', fontSize: 20, flexShrink: 0 }} />
+        <Box sx={{ position: 'relative', mb: 3 }}>
+          <Icon
+            name="search"
+            style={{
+              color: '#64748b',
+              fontSize: 20,
+              position: 'absolute',
+              left: 12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              pointerEvents: 'none',
+            }}
+          />
           <InputBase
             placeholder="Search your GitHub repositories..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{
-              flex: 1,
-              ml: 1,
+              width: '100%',
+              bgcolor: '#192540',
+              borderRadius: '8px',
               fontSize: '0.875rem',
-              color: '#dee5ff',
-              '& input::placeholder': { color: '#475569' },
+              color: 'text.primary',
+              pl: '40px',
+              pr: 2,
               py: 1.5,
+              '& input::placeholder': { color: '#475569' },
+              '& input': { py: 0 },
+              '&.Mui-focused': {
+                outline: (theme) => `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+                outlineOffset: '-2px',
+              },
             }}
           />
         </Box>
@@ -150,8 +161,10 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
           sx={{
             maxHeight: 350,
             overflowY: 'auto',
-            pr: 0.5,
-            mb: 0,
+            pr: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
             '&::-webkit-scrollbar': { width: '4px' },
             '&::-webkit-scrollbar-thumb': { bgcolor: '#40485d', borderRadius: '10px' },
             '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
@@ -159,7 +172,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
         >
           {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress size={24} sx={{ color: '#a3a6ff' }} />
+              <CircularProgress size={24} sx={{ color: 'primary.main' }} />
             </Box>
           ) : filtered.length === 0 ? (
             <Typography sx={{ textAlign: 'center', color: '#475569', py: 4, fontSize: '0.875rem' }}>
@@ -175,10 +188,10 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
                   justifyContent: 'space-between',
                   p: 1.5,
                   borderRadius: '8px',
-                  transition: 'bgcolor 0.2s',
+                  transition: 'background-color 0.2s',
                   cursor: 'pointer',
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
-                  '&:hover .repo-icon': { color: '#a3a6ff' },
+                  '&:hover .repo-icon': { color: 'primary.main' },
                 }}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -205,8 +218,8 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    color: '#a3a6ff',
-                    border: '1px solid rgba(163,166,255,0.3)',
+                    color: 'primary.main',
+                    border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                     px: 1.5,
                     py: 0.5,
                     borderRadius: '4px',
@@ -215,7 +228,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
                     flexShrink: 0,
                     transition: 'all 0.2s',
                     opacity: connecting === repo.full_name ? 0.5 : 1,
-                    '&:hover:not(:disabled)': { bgcolor: '#a3a6ff', color: '#0f00a4' },
+                    '&:hover:not(:disabled)': { bgcolor: 'primary.main', color: 'primary.contrastText' },
                   }}
                 >
                   {connecting === repo.full_name ? 'Connecting…' : 'Connect'}
@@ -239,7 +252,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Icon name="info" style={{ fontSize: 16, color: '#a3aac4' }} />
-          <Typography sx={{ fontSize: '0.75rem', color: '#a3aac4' }}>
+          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
             {remaining > 0 ? `${remaining} more repositories available` : `${externalRepos.length} repositories loaded`}
           </Typography>
         </Box>
@@ -249,7 +262,7 @@ export const ConnectRepoDialog = ({ open, onClose }: ConnectRepoDialogProps) => 
             bgcolor: 'transparent',
             border: 'none',
             fontSize: '0.875rem',
-            color: '#a3a6ff',
+            color: 'primary.main',
             cursor: 'pointer',
             fontWeight: 500,
             '&:hover': { textDecoration: 'underline' },

@@ -16,8 +16,8 @@ export const AppLayout = ({ children, pageTitle }: AppLayoutProps) => {
         component="main"
         sx={{
           ml: '256px',
-          pt: '6rem',
           p: 4,
+          pt: '6rem',
           minHeight: '100vh',
         }}
       >

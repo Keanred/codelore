@@ -1,46 +1,21 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 import { AppLayout } from '../components/AppLayout';
+import { ConnectRepoDialog } from '../components/ConnectRepoDialog';
 import { Icon } from '../components/Icon';
+import { RepoCard } from '../components/RepoCard';
 import { StatCard } from '../components/StatCard';
 import { useReposQuery } from '../reposQuery';
 import { useStatsQuery } from '../statsQuery';
-
-const STATUS_CONFIG = {
-  idle: {
-    label: 'Idle',
-    dot: '#64748b',
-    bg: '#1e293b',
-    color: '#cbd5e1',
-    border: 'transparent',
-    hoverBorder: '#a3a6ff',
-    hoverText: '#a3a6ff',
-  },
-  syncing: {
-    label: 'Syncing',
-    dot: '#69f6b8',
-    bg: 'rgba(105,246,184,0.1)',
-    color: '#69f6b8',
-    border: 'rgba(105,246,184,0.2)',
-    hoverBorder: '#69f6b8',
-    hoverText: '#69f6b8',
-  },
-  error: {
-    label: 'Error',
-    dot: '#ff6e84',
-    bg: 'rgba(255,110,132,0.1)',
-    color: '#ff6e84',
-    border: 'rgba(255,110,132,0.2)',
-    hoverBorder: '#ff6e84',
-    hoverText: '#ff6e84',
-  },
-};
 
 // ─── Dashboard Page ────────────────────────────────────────────────────────────
 
 export const DashboardPage = () => {
   const { data: repoData, isPending, isError, error } = useReposQuery();
   const { data: statsData } = useStatsQuery();
+  const [isConnectModalOpen, setConnectModalOpen] = useState(false);
+
   const statCards = [
     {
       label: 'Total Repositories',
@@ -94,6 +69,7 @@ export const DashboardPage = () => {
           gap: 3,
         }}
       >
+        <ConnectRepoDialog open={isConnectModalOpen} onClose={() => setConnectModalOpen(false)} />
         <Box>
           <Typography
             sx={{
@@ -113,6 +89,7 @@ export const DashboardPage = () => {
 
         <Box
           component="button"
+          onClick={() => setConnectModalOpen(true)}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -193,108 +170,9 @@ export const DashboardPage = () => {
       </Box>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' }, gap: 2 }}>
-        {repoData.map((repo) => {
-          const status: keyof typeof STATUS_CONFIG = 'idle';
-          const s = STATUS_CONFIG[status];
-          const meta = `${repo.githubOwner} • main`;
-          return (
-            <Box
-              key={repo.id}
-              sx={{
-                bgcolor: '#0f1930',
-                borderRadius: '12px',
-                p: 2.5,
-                borderLeft: '2px solid transparent',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  bgcolor: '#1f2b49',
-                  borderLeftColor: s.hoverBorder,
-                  '& .repo-name': { color: s.hoverText },
-                },
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: '8px',
-                      bgcolor: '#192540',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon name="folder_zip" style={{ fontSize: 28, color: '#818cf8' }} />
-                  </Box>
-                  <Box>
-                    <Typography
-                      className="repo-name"
-                      sx={{
-                        fontFamily: "'Space Grotesk', sans-serif",
-                        fontSize: '1.0625rem',
-                        fontWeight: 700,
-                        color: '#dee5ff',
-                        transition: 'color 0.2s',
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      {repo.name}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.75rem', color: '#475569', fontFamily: 'monospace', mt: 0.5 }}>
-                      {meta}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, ml: 2 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.75,
-                      px: 1,
-                      py: 0.5,
-                      borderRadius: '4px',
-                      bgcolor: s.bg,
-                      color: s.color,
-                      border: `1px solid ${s.border}`,
-                      fontSize: '0.625rem',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                    }}
-                  >
-                    <Box
-                      component="span"
-                      sx={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        bgcolor: s.dot,
-                        flexShrink: 0,
-                      }}
-                    />
-                    {s.label}
-                  </Box>
-                  <Typography
-                    sx={{
-                      fontSize: '0.625rem',
-                      color: '#475569',
-                      mt: 1,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    Last synced: —
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          );
-        })}
+        {repoData.map((repo) => (
+          <RepoCard key={repo.id} repo={repo} status="idle" />
+        ))}
       </Box>
     </AppLayout>
   );
