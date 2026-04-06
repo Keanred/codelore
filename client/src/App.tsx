@@ -5,7 +5,7 @@ import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
 import { appTheme } from './theme';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const App = () => {
   return (

@@ -1,152 +1,156 @@
+import { RepoResponse } from '@codelore/schemas';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import LinearProgress from '@mui/material/LinearProgress';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Icon } from './Icon';
 
-const statusConfig = {
-  synced: { label: 'Synced', color: '#69f6b8', bg: 'rgba(0,108,73,0.2)', animation: 'pulse 2s infinite' },
-  syncing: { label: 'Syncing', color: '#a3a6ff', bg: 'rgba(163,166,255,0.2)', animation: 'bounce 1s infinite' },
-  idle: { label: 'Idle', color: '#94A3B8', bg: 'rgba(30,41,59,0.5)', animation: 'none' },
-};
+export type RepoStatus = 'idle' | 'syncing' | 'error';
 
-const langBgMap: Record<string, string> = { JS: '#1e1b4b', PY: '#1e293b' };
-const getLangBg = (lang: string) => langBgMap[lang] ?? '#450a0a';
+const STATUS_CONFIG = {
+  idle: {
+    label: 'Idle',
+    dotColor: '#64748b',
+    badgeBg: '#1e293b',
+    badgeColor: '#cbd5e1',
+    badgeBorder: 'transparent',
+    hoverBorder: '#a3a6ff',
+    hoverText: '#a3a6ff',
+    iconColor: '#818cf8',
+    cardIcon: 'source',
+  },
+  syncing: {
+    label: 'Syncing',
+    dotColor: '#69f6b8',
+    badgeBg: 'rgba(105,246,184,0.1)',
+    badgeColor: '#69f6b8',
+    badgeBorder: 'rgba(105,246,184,0.2)',
+    hoverBorder: '#69f6b8',
+    hoverText: '#69f6b8',
+    iconColor: '#69f6b8',
+    cardIcon: 'sync',
+  },
+  error: {
+    label: 'Error',
+    dotColor: '#ff6e84',
+    badgeBg: 'rgba(255,110,132,0.1)',
+    badgeColor: '#ff6e84',
+    badgeBorder: 'rgba(255,110,132,0.2)',
+    hoverBorder: '#ff6e84',
+    hoverText: '#ff6e84',
+    iconColor: '#ff6e84',
+    cardIcon: 'warning',
+  },
+} satisfies Record<RepoStatus, object>;
 
-interface RepoCardHeaderProps {
-  icon: string;
-  status: 'synced' | 'syncing' | 'idle';
+interface RepoCardProps {
+  repo: RepoResponse;
+  status?: RepoStatus;
+  lastSynced?: string;
+  onClick?: () => void;
 }
 
-const RepoCardHeader = ({ icon, status }: RepoCardHeaderProps) => {
-  const s = statusConfig[status];
+export const RepoCard = ({ repo, status = 'idle', lastSynced, onClick }: RepoCardProps) => {
+  const config = STATUS_CONFIG[status];
+
+  const syncedLabel =
+    lastSynced ??
+    new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
+      -Math.round((Date.now() - new Date(repo.createdAt).getTime()) / (1000 * 60 * 60)),
+      'hours',
+    );
+
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
-      <Box
-        sx={{
-          p: 1,
-          bgcolor: 'rgba(99,102,241,0.1)',
-          borderRadius: '8px',
-          fontSize: 22,
-          color: '#818CF8',
-          display: 'flex',
-        }}
-      >
-        <Icon name={icon} />
-      </Box>
-      <Stack
-        direction="row"
-        alignItems="center"
-        gap={0.5}
-        sx={{ px: 1, py: 0.25, borderRadius: '99px', bgcolor: s.bg }}
-      >
-        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: s.color, animation: s.animation }} />
-        <Typography
-          sx={{
-            fontSize: '0.6rem',
-            fontWeight: 700,
-            color: s.color,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}
-        >
-          {s.label}
-        </Typography>
-      </Stack>
-    </Stack>
-  );
-};
-
-export interface RepoCardProps {
-  icon: string;
-  name: string;
-  subtitle: string;
-  status: 'synced' | 'syncing' | 'idle';
-  nodes: string;
-  progress?: number;
-  langs?: string[];
-}
-
-export const RepoCard = ({ icon, name, subtitle, status, nodes, progress, langs }: RepoCardProps) => (
-  <Box
-    sx={{
-      bgcolor: '#0f1930',
-      p: 2.5,
-      borderRadius: '12px',
-      border: '1px solid rgba(64,72,93,0.1)',
-      cursor: 'pointer',
-      '&:hover': { bgcolor: '#141f38' },
-      transition: 'background-color 0.2s',
-    }}
-  >
-    <RepoCardHeader icon={icon} status={status} />
-
-    <Typography
+    <Box
+      onClick={onClick}
       sx={{
-        fontFamily: "'Space Grotesk', sans-serif",
-        fontWeight: 700,
-        fontSize: '1.1rem',
-        color: '#dee5ff',
-        '&:hover': { color: '#a3a6ff' },
-        mb: 0.5,
+        bgcolor: '#0f1930',
+        borderRadius: '12px',
+        p: 2.5,
+        transition: 'all 0.2s',
+        borderLeft: '2px solid transparent',
+        cursor: onClick ? 'pointer' : 'default',
+        '&:hover': {
+          bgcolor: '#1f2b49',
+          borderLeftColor: config.hoverBorder,
+          '& .repo-name': { color: config.hoverText },
+        },
       }}
     >
-      {name}
-    </Typography>
-    <Typography sx={{ fontSize: '0.8rem', color: '#a3aac4', fontFamily: "'JetBrains Mono', monospace", mb: 2 }}>
-      {subtitle}
-    </Typography>
-
-    {status === 'syncing' && progress !== undefined && (
-      <LinearProgress
-        variant="determinate"
-        value={progress}
-        sx={{
-          mb: 2,
-          height: 4,
-          borderRadius: 2,
-          bgcolor: '#192540',
-          '& .MuiLinearProgress-bar': { bgcolor: '#a3a6ff' },
-        }}
-      />
-    )}
-
-    <Divider sx={{ borderColor: 'rgba(64,72,93,0.1)', mb: 1.5 }} />
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Typography sx={{ fontSize: '0.65rem', color: '#64748B', fontFamily: "'JetBrains Mono', monospace" }}>
-        {nodes}
-      </Typography>
-      {langs && (
-        <Stack direction="row" sx={{ '& > *:not(:first-of-type)': { ml: -0.75 } }}>
-          {langs.map((lang) => (
-            <Box
-              key={lang}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        {/* Left: icon + info */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: '8px',
+              bgcolor: '#192540',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <Icon name={config.cardIcon} style={{ fontSize: 28, color: config.iconColor }} />
+          </Box>
+          <Box>
+            <Typography
+              className="repo-name"
               sx={{
-                width: 24,
-                height: 24,
-                borderRadius: '50%',
-                border: '2px solid #060e20',
-                bgcolor: getLangBg(lang),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.5rem',
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: '1.0625rem',
+                fontWeight: 700,
                 color: '#dee5ff',
+                transition: 'color 0.2s',
+                lineHeight: 1.3,
               }}
             >
-              {lang}
-            </Box>
-          ))}
-        </Stack>
-      )}
-      {status === 'syncing' && progress !== undefined && (
-        <Typography
-          sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#a3a6ff', fontFamily: "'JetBrains Mono', monospace" }}
-        >
-          {progress}%
-        </Typography>
-      )}
-    </Stack>
-  </Box>
-);
+              {repo.githubOwner}/{repo.name}
+            </Typography>
+            <Typography sx={{ fontSize: '0.75rem', color: '#475569', fontFamily: 'monospace', mt: 0.5 }}>
+              {repo.githubOwner} · {repo.githubId}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Right: status badge + last synced */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0, ml: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75,
+              px: 1,
+              py: 0.5,
+              borderRadius: '4px',
+              bgcolor: config.badgeBg,
+              color: config.badgeColor,
+              border: `1px solid ${config.badgeBorder}`,
+              fontSize: '0.625rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: config.dotColor,
+                flexShrink: 0,
+                ...(status === 'syncing' && { animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' }),
+              }}
+            />
+            {config.label}
+          </Box>
+          <Typography
+            sx={{ fontSize: '0.625rem', color: '#475569', mt: 1, textTransform: 'uppercase', letterSpacing: '0.05em' }}
+          >
+            Last synced: {syncedLabel}
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+};

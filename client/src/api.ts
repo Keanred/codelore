@@ -1,10 +1,14 @@
-import type { CreateItemInput, ItemResponse, UpdateItemInput } from '@codelore/schemas';
+import {
+  CommitResponse,
+  ConnectRepoInput,
+  FileResponse,
+  GitHubRepo,
+  NoteResponse,
+  RepoResponse,
+  SearchResponse,
+} from '@codelore/schemas';
 
 const API_BASE = '/api';
-
-type ApiSuccess<TData> = { success: true; data: TData };
-type ApiFailure = { success: false; error: unknown };
-type ApiResponse<TData> = ApiSuccess<TData> | ApiFailure;
 
 export class ApiClientError extends Error {
   readonly status: number;
@@ -30,23 +34,73 @@ const request = async <TResponse, TBody = unknown>(
   }
 
   const res = await fetch(`${API_BASE}${path}`, init);
-  const payload = (await res.json()) as ApiResponse<TResponse>;
 
-  if (!res.ok || !payload.success) {
-    throw new ApiClientError(`Request failed with status ${res.status}`, res.status);
+  if (res.status === 204) {
+    return undefined as TResponse;
   }
 
-  return payload.data;
+  const payload = await res.json();
+
+  if (!res.ok) {
+    const message = typeof payload?.error === 'string' ? payload.error : `Request failed with status ${res.status}`;
+    throw new ApiClientError(message, res.status);
+  }
+
+  return payload as TResponse;
 };
 
-export const getItems = (): Promise<ItemResponse[]> => request<ItemResponse[]>('/items');
+export const getRepos = async (): Promise<RepoResponse[]> => {
+  return request<RepoResponse[]>('/repos');
+};
 
-export const getItem = (id: string): Promise<ItemResponse> => request<ItemResponse>(`/items/${id}`);
+export const getExternalRepos = async (): Promise<GitHubRepo[]> => {
+  return request<GitHubRepo[]>('/external-repos');
+};
 
-export const createItem = (input: CreateItemInput): Promise<ItemResponse> =>
-  request<ItemResponse, CreateItemInput>('/items', 'POST', input);
+export const connectRepo = async (input: ConnectRepoInput): Promise<RepoResponse> => {
+  return request<RepoResponse, ConnectRepoInput>('/repos', 'POST', input);
+};
 
-export const updateItem = (id: string, input: UpdateItemInput): Promise<ItemResponse> =>
-  request<ItemResponse, UpdateItemInput>(`/items/${id}`, 'PATCH', input);
+export const triggerSync = async (repoId: string): Promise<void> => {
+  await request(`/repos/${repoId}/sync`, 'POST');
+};
 
-export const deleteItem = (id: string): Promise<void> => request<void>(`/items/${id}`, 'DELETE');
+export const getFiles = async (repoId: string): Promise<FileResponse[]> => {
+  return request<FileResponse[]>(`/repos/${repoId}/files`);
+};
+
+export const getFile = async (fileId: string): Promise<FileResponse> => {
+  return request<FileResponse>(`/files/${fileId}`);
+};
+
+export const getCommits = async (repoId: string): Promise<CommitResponse[]> => {
+  return request<CommitResponse[]>(`/repos/${repoId}/commits`);
+};
+
+export const getFileCommits = async (fileId: string): Promise<CommitResponse[]> => {
+  return request<CommitResponse[]>(`/files/${fileId}/commits`);
+};
+
+export const getFileNotes = async (fileId: string): Promise<NoteResponse[]> => {
+  return request<NoteResponse[]>(`/files/${fileId}/notes`);
+};
+
+export const createNote = async (fileId: string, content: string): Promise<NoteResponse> => {
+  return request<NoteResponse, { content: string }>(`/files/${fileId}/notes`, 'POST', { content });
+};
+
+export const deleteNote = async (fileId: string, noteId: string): Promise<void> => {
+  await request(`/files/${fileId}/notes/${noteId}`, 'DELETE');
+};
+
+export const search = async (query: string, repoId?: string): Promise<SearchResponse> => {
+  const params = new URLSearchParams({ q: query });
+  if (repoId) {
+    params.append('repoId', repoId);
+  }
+  return request<SearchResponse>(`/search?${params.toString()}`);
+};
+
+export const getStats = async (): Promise<{ repoCount: number; fileCount: number; noteCount: number }> => {
+  return request<{ repoCount: number; fileCount: number; noteCount: number }>('/stats');
+};
