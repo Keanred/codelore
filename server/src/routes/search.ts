@@ -1,7 +1,7 @@
 import { searchCommits, searchFiles, searchNotes } from '@/db/queries/search';
 import { SearchResponse } from '@codelore/schemas';
 import { NextFunction, Request, Response, Router } from 'express';
-import { InternalServerError } from '../errors/http';
+import { BadRequestError, InternalServerError } from '../errors/http';
 
 const searchRouter = Router();
 
@@ -9,8 +9,7 @@ searchRouter.get('/search', async (req: Request, res: Response, next: NextFuncti
   try {
     const { q, repoId } = req.query;
     if (typeof q !== 'string') {
-      res.status(400).json({ error: "Query parameter 'q' is required and must be a string" });
-      return;
+      return next(new BadRequestError("Query parameter 'q' is required and must be a string"));
     }
 
     const [files, commits, notes] = await Promise.all([

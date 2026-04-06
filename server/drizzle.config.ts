@@ -10,11 +10,11 @@ const postgresPort = process.env.POSTGRES_PORT ?? '5432';
 const localDatabaseUrl = `postgresql://${postgresUser}:${postgresPassword}@${postgresHost}:${postgresPort}/${postgresDb}`;
 const databaseUrlDev = process.env.DATABASE_URL_DEV;
 const databaseUrlProd = process.env.DATABASE_URL_PROD;
-const databaseUrl = isProduction ? (databaseUrlProd ?? localDatabaseUrl) : (databaseUrlDev ?? localDatabaseUrl);
-
-if (!databaseUrl) {
+if (isProduction && !databaseUrlProd) {
   throw new Error('DATABASE_URL_PROD is required when NODE_ENV=production');
 }
+
+const databaseUrl = isProduction ? databaseUrlProd! : (databaseUrlDev ?? localDatabaseUrl);
 
 export default defineConfig({
   schema: './src/db/schema.ts',

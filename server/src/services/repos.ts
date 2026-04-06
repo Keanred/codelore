@@ -1,4 +1,4 @@
-import { dbAddRepo, dbGetRepoById, dbGetRepos } from '@/db/queries/repos';
+import { dbAddRepo, dbGetRepoById, dbGetRepoCount, dbGetRepos } from '@/db/queries/repos';
 import { ConnectRepoInput } from '@codelore/schemas';
 
 export const connectRepo = async ({ githubId, name, owner }: ConnectRepoInput) => {
@@ -16,4 +16,9 @@ export const getRepos = async () => {
 
 export const getRepoById = async (id: string) => {
   return dbGetRepoById(id);
+};
+
+export const getRepoCount = async () => {
+  const repoCount = await dbGetRepoCount();
+  return repoCount;
 };

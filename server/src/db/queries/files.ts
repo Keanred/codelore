@@ -1,4 +1,4 @@
-import { asc, desc, eq, sql } from 'drizzle-orm';
+import { asc, count, desc, eq, sql } from 'drizzle-orm';
 import { db } from '../client';
 import { Commit, commits, File, fileCommits, files } from '../schema';
 
@@ -32,4 +32,9 @@ export const dbGetCommitsByFileId = async (fileId: string): Promise<Commit[]> =>
     .where(eq(fileCommits.fileId, fileId))
     .orderBy(desc(commits.date));
   return result.map((row) => row.commits);
+};
+
+export const dbGetFileCount = async (): Promise<number> => {
+  const [countResult] = await db.select({ count: count(files.id) }).from(files);
+  return Number(countResult.count);
 };

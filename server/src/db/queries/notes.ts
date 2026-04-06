@@ -1,9 +1,9 @@
 import { CreateNoteInput } from '@codelore/schemas';
-import { desc, eq } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 import { db } from '../client';
 import { Note, notes } from '../schema';
 
-export const dbGetNotesByFileId = (fileId: string): Promise<Note[]> => {
+export const dbGetNotesByFileId = async (fileId: string): Promise<Note[]> => {
   const result = db.select().from(notes).where(eq(notes.fileId, fileId)).orderBy(desc(notes.createdAt));
   return result;
 };
@@ -15,4 +15,9 @@ export const dbCreateNote = async ({ fileId, content }: CreateNoteInput): Promis
 
 export const dbDeleteNote = async (noteId: string): Promise<void> => {
   await db.delete(notes).where(eq(notes.id, noteId));
+};
+
+export const dbGetNoteCount = async (): Promise<number> => {
+  const [countResult] = await db.select({ count: count(notes.id) }).from(notes);
+  return Number(countResult.count);
 };

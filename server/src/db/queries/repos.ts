@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { db } from '../client';
 import { repos } from '../schema';
 
@@ -30,6 +30,16 @@ export const dbAddRepo = async (repo: NewRepo) => {
     return result;
   } catch (error) {
     console.error('Error adding repository:', error);
+    throw error;
+  }
+};
+
+export const dbGetRepoCount = async () => {
+  try {
+    const [countResult] = await db.select({ count: count(repos.id) }).from(repos);
+    return Number(countResult.count);
+  } catch (error) {
+    console.error('Error counting repositories:', error);
     throw error;
   }
 };
