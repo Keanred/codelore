@@ -1,7 +1,7 @@
-import { dbGetLatestCommitDate, dbUpsertCommit } from '../db/queries/commits';
+import { dbUpsertCommit } from '../db/queries/commits';
 import { dbInsertFileCommit } from '../db/queries/fileCommits';
 import { upsertFile } from '../db/queries/files';
-import { getCommitFiles, getRepoCommits } from './github';
+import { getCommitFiles, getLatestCommitDate, getRepoCommits } from './github';
 
 const CONCURRENCY = 5;
 
@@ -10,10 +10,6 @@ async function runConcurrent<T>(items: T[], concurrency: number, fn: (item: T) =
     await Promise.all(items.slice(i, i + concurrency).map(fn));
   }
 }
-
-export const getLatestCommitDate = async (repoId: string): Promise<string | null> => {
-  return dbGetLatestCommitDate(repoId);
-};
 
 export const syncRepo = async (repoId: string, owner: string, repoName: string): Promise<void> => {
   // Step 1: fetch commits since the last sync (or all commits on first run)

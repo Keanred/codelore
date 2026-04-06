@@ -113,7 +113,7 @@ export { CreateNoteInputSchema as CreateNoteInput };
 const SearchResponseSchema = z.object({
   files: z.array(FileResponseSchema),
   commits: z.array(CommitResponseSchema),
-  notes: z.array(NoteResponseSchema),
+  notes: z.array(NoteResponseSchema.extend({ filePath: z.string() })),
 });
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;
 export { SearchResponseSchema as SearchResponse };

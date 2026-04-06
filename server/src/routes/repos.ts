@@ -39,12 +39,10 @@ router.post('/repos/:id/sync', async (req: Request, res: Response, next: NextFun
     if (!repo) {
       return next(new NotFoundError('Repository not found'));
     }
-    syncRepo(repo.id, repo.githubOwner, repo.name)
-      .then(() => res.json({ message: 'Sync started' }))
-      .catch((err) => {
-        console.error(`syncRepo failed for repo ${repo.id}:`, err);
-        next(new InternalServerError('Failed to start sync'));
-      });
+    syncRepo(repo.id, repo.githubOwner, repo.name).catch((err) => {
+      console.error(`syncRepo failed for repo ${repo.id}:`, err);
+    });
+    res.status(202).json({ message: 'Sync started' });
   } catch (error) {
     console.error('Error syncing repo:', error);
     next(isHttpError(error) ? error : new InternalServerError('Failed to start sync'));

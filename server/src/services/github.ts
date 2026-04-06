@@ -1,7 +1,12 @@
 import { GitHubCommit, GitHubCommitFile, GitHubCommitSummary, GitHubRepo } from '@codelore/schemas';
 import { z } from 'zod';
 import { config } from '../config';
+import { dbGetLatestCommitDate } from '../db/queries/commits';
 import { ForbiddenError, TooManyRequestsError } from '../errors/http';
+
+export const getLatestCommitDate = async (repoId: string): Promise<string | null> => {
+  return dbGetLatestCommitDate(repoId);
+};
 
 export const getUserRepos = async (token: string): Promise<GitHubRepo[]> => {
   const response = await fetch('https://api.github.com/user/repos', {

@@ -20,11 +20,8 @@ export const getCommitsByFileId = async (fileId: string): Promise<Commit[]> => {
 };
 
 export const getNotesByFileId = async (fileId: string) => {
-  const result = await dbGetNotesByFileId(fileId);
-  if (!result) {
-    throw new NotFoundError(`File with id ${fileId} not found`);
-  }
-  return result;
+  await getFileById(fileId); // throws NotFoundError if file doesn't exist
+  return dbGetNotesByFileId(fileId);
 };
 
 export const createNote = async (fileId: string, content: string): Promise<Note> => {

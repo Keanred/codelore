@@ -61,7 +61,7 @@ filesRouter.post('/files/:fileId/notes', async (req: Request, res: Response, nex
   try {
     const parsedRequest = CreateNoteInput.parse({ fileId: req.params.fileId, ...req.body });
     const note = await createNote(parsedRequest.fileId, parsedRequest.content);
-    res.json(note);
+    res.status(201).json(note);
   } catch (error) {
     console.error('Error creating note for file:', error);
     if (error instanceof ZodError) {

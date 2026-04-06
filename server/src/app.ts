@@ -1,13 +1,19 @@
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import { isHttpError } from './errors/http';
+import filesRouter from './routes/files';
 import reposRouter from './routes/repos';
+import searchRouter from './routes/search';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+app.use('/api', reposRouter);
+app.use('/api', filesRouter);
+app.use('/api', searchRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
@@ -18,7 +24,5 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
   res.status(500).json({ success: false, error: 'Something went wrong!' });
 });
-
-app.use('/api', reposRouter);
 
 export default app;
