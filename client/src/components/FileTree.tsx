@@ -1,6 +1,7 @@
 import { FileResponse } from '@codelore/schemas';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 import { Icon } from './Icon';
 
 // ─── Tree row helpers ─────────────────────────────────────────────────────────
@@ -43,6 +44,30 @@ const Row = ({ indent = 0, active = false, dimmed = false, onClick, children }: 
   </Box>
 );
 
+// ─── File icon helper ───────────────────────────────────────────────────────────
+
+const FILE_ICONS: Record<string, string> = {
+  ts: 'code',
+  tsx: 'code',
+  js: 'code',
+  jsx: 'code',
+  json: 'settings',
+  md: 'article',
+  css: 'palette',
+  scss: 'palette',
+  html: 'html',
+  svg: 'image',
+  png: 'image',
+  jpg: 'image',
+  jpeg: 'image',
+  webp: 'image',
+};
+
+const fileIcon = (name: string): string => {
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  return FILE_ICONS[ext] ?? 'description';
+};
+
 // ─── FileTree ─────────────────────────────────────────────────────────────────
 
 type TreeNode = { name: string; path: string; children: TreeNode[] };
@@ -74,23 +99,41 @@ type FileTreeProps = {
 };
 export const FileTree = ({ files, selectedFileId, onSelect }: FileTreeProps) => {
   const tree = flatPathsToTree(files.map((file) => file.path));
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const toggleFolder = (path: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
 
   const renderTree = (nodes: TreeNode[], indent = 0): React.ReactNode[] => {
     return nodes.flatMap((node) => {
       const isFolder = node.children.length > 0;
+      const isExpanded = expanded.has(node.path);
       const file = !isFolder ? files.find((f) => f.path === node.path) : undefined;
       return [
         <Row
           key={node.path}
           indent={indent}
           active={node.path === selectedFileId}
-          onClick={() => file && onSelect(file)}
+          onClick={() => (isFolder ? toggleFolder(node.path) : file && onSelect(file))}
         >
-          <ArrowSpacer />
-          <Icon name={isFolder ? 'folder' : 'description'} style={{ fontSize: 16, flexShrink: 0 }} />
+          {isFolder ? <Arrow expanded={isExpanded} /> : <ArrowSpacer />}
+          <Icon
+            name={isFolder ? 'folder' : fileIcon(node.name)}
+            filled={isFolder}
+            style={{ fontSize: 16, flexShrink: 0, color: isFolder ? '#a3a6ff' : undefined }}
+          />
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
         </Row>,
-        ...renderTree(node.children, indent + 1),
+        ...(isFolder && isExpanded ? renderTree(node.children, indent + 1) : []),
       ];
     });
   };
@@ -136,7 +179,9 @@ export const FileTree = ({ files, selectedFileId, onSelect }: FileTreeProps) => 
       </Box>
 
       {/* Tree */}
-      {renderTree(tree)}
+      <Box sx={{ flex: 1, overflowY: 'auto', py: 1, fontFamily: 'monospace', fontSize: '0.875rem' }}>
+        {renderTree(tree)}
+      </Box>
     </Box>
   );
 };
