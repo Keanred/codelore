@@ -6,7 +6,6 @@ import { getRepoCount } from '../services/repos';
 const statsRouter = Router();
 
 statsRouter.get('/stats', async (_req: Request, res: Response) => {
-  // Placeholder for actual stats fetching logic
   const repoCount = await getRepoCount();
   const fileCount = await getFileCount();
   const noteCount = await getNoteCount();

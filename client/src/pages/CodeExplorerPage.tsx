@@ -18,6 +18,7 @@ export const CodeExplorerPage = () => {
   const [isConnectOpen, setConnectOpen] = useState(false);
   const { data: files = [] } = useFilesQuery(selectedRepo?.id || '');
   const [selectedFile, setSelectedFile] = useState<FileResponse | null>(null);
+  const [addNoteLine, setAddNoteLine] = useState<number | null>(null);
 
   const handleSelectRepo = (repo: RepoResponse) => setSelectedRepo(repo);
   const handleBackToSelector = () => setSelectedRepo(null);
@@ -190,7 +191,11 @@ export const CodeExplorerPage = () => {
           /* 3-column code explorer */
           <>
             <FileTree files={files} selectedFileId={selectedFile?.path ?? null} onSelect={setSelectedFile} />
-            <CodeViewer />
+            <CodeViewer
+              addNoteLine={addNoteLine}
+              onAddNoteClose={() => setAddNoteLine(null)}
+              onAddNote={setAddNoteLine}
+            />
             <MemoryPanel />
           </>
         ) : (
